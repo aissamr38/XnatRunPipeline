@@ -1,4 +1,0 @@
-<!-- Sequence 30 -->
-<li class="yuimenuitem">
-	<a class="yuimenuitemlabel" href="$link.setPage('XDATScreen_project_export_data.vm').addPathInfo('project', $project.getId())">Export Data (ICM)</a>
-</li>
