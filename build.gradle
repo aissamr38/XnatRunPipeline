@@ -7,8 +7,8 @@
  * Released under the Simplified BSD.
  */
 
-def groupName = 'org.nrg.xnat.icm'
-def pluginVersion = '1.1.1'
+def groupName = 'org.nrg.xnat.int'
+def pluginVersion = '1.1.2'
 
 group groupName
 version pluginVersion
@@ -177,7 +177,7 @@ dependencies {
     compile group: 'org.apache.commons', name: 'commons-csv', version: '1.6'
     compile group: 'com.jcraft', name: 'jsch', version: '0.1.54'
     //compile group: 'com.hierynomus', name: 'sshj', version: '0.32.0'
-    
+
     compile "ecs:ecs"
     compile("stratum:stratum") {
         transitive = false
@@ -194,7 +194,7 @@ publishing.publications {
 
         pom.withXml {
             def root = asNode()
-            root.appendNode('name', 'XNAT ICM Export Data Plugin')
+            root.appendNode('name', 'XNAT Run Pipeline Plugin')
             root.appendNode('inceptionYear', '2018')
 
             def license = root.appendNode('licenses').appendNode('license')
@@ -205,9 +205,9 @@ publishing.publications {
             def developers = root.appendNode('developers')
 
             def glim = developers.appendNode('developer')
-            glim.appendNode('id', 'gregoire.limansky')
-            glim.appendNode('name', 'Grégoire Limansky')
-            glim.appendNode('email', 'gregoire.limansky@icm-institute.org')
+            glim.appendNode('id', 'david.meunier')
+            glim.appendNode('name', 'David Meunier')
+            glim.appendNode('email', 'david.meunier@univ-amu.fr')
         }
     }
 }

@@ -4,7 +4,7 @@ package org.nrg.xnat.icm.rest;
 
 import java.util.Arrays;
 import org.slf4j.LoggerFactory;
-import org.nrg.xnat.icm.plugin.XnatIcmExportDataPlugin;
+import org.nrg.xnat.icm.plugin.XnatIntRunPipelinePlugin;
 import java.io.FileInputStream;
 import java.util.zip.ZipEntry;
 import java.io.OutputStream;
@@ -72,7 +72,7 @@ public class XnatToBidsApi
     private int _subjectIndex;
     private int _sessionIndex;
     private int _scanIndex;
-    
+
     @ApiOperation(value = "Convert XNAT Subject To Bids", notes = "Custom", response = String.class, responseContainer = "String")
     @ApiResponses({ @ApiResponse(code = 200, message = "Detection successfully done"), @ApiResponse(code = 401, message = "Must be authenticated to access the XNAT Rest Api"), @ApiResponse(code = 500, message = "Unexpected internal serval error") })
     @RequestMapping(value = { "/convert-to-bids/{id_project}/{id_subject}" }, produces = { "text/plain" }, method = { RequestMethod.GET })
@@ -86,7 +86,7 @@ public class XnatToBidsApi
         final String response = xnatToBidsUtils.convertToBidsFunction(id_project, id_subjects);
         return (ResponseEntity<String>)new ResponseEntity((Object)response, HttpStatus.OK);
     }
-    
+
     public String convertToBidsFunction(final String id_project, final List<String> id_subjects) {
         this.log("*****************************************************************************");
         this.log("***********************XNAT*****TO********BIDS*******************************");
@@ -171,7 +171,7 @@ public class XnatToBidsApi
         this.log("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
         return this._tempZipPath;
     }
-    
+
     private void handleSubject(final XnatSubjectdata xnatSubject) throws Exception {
         this.log("**************************************");
         this.log("Subject #" + this._subjectIndex + " [" + xnatSubject.getId() + "]");
@@ -209,7 +209,7 @@ public class XnatToBidsApi
             this.writeTsvRecord(this._participantsTsvFile, recordValues);
         }
     }
-    
+
     private void handleSession(final XnatImagesessiondata xnatImageSessionData) throws Exception {
         this.log("++++++++++++++++++++++++++++++++++++++");
         this.log("Session #" + this._sessionIndex + " [" + xnatImageSessionData.getId() + "]");
@@ -230,7 +230,7 @@ public class XnatToBidsApi
             this.handleScan(xnatImageSessionData, xnatScan);
         }
     }
-    
+
     private void handleScan(final XnatImagesessiondata xnatImageSessionData, final XnatImagescandataI xnatScan) throws Exception {
         final String sessionDir = String.format("%s/sub-%02d/ses-%03d", this._tempBidsPath, this._subjectIndex, this._sessionIndex);
         final String xnatProjectRootPath = xnatImageSessionData.getArchivePath();
@@ -460,7 +460,7 @@ public class XnatToBidsApi
             }
         }
     }
-    
+
     private void createBidsZipFile() {
         final File bidsFolder = new File(this._tempBidsPath);
         final File zipFile = new File(this._tempZipPath, "BIDS.zip");
@@ -476,7 +476,7 @@ public class XnatToBidsApi
             ioe.printStackTrace();
         }
     }
-    
+
     private void addDirToZip(final ZipOutputStream zipOutputStream, final File folder) {
         try {
             for (final File folderFile : folder.listFiles()) {
@@ -507,7 +507,7 @@ public class XnatToBidsApi
             e.printStackTrace();
         }
     }
-    
+
     private boolean writeJsonFile(final File jsonFile, final JSONObject contents) {
         try (final FileWriter file = new FileWriter(jsonFile)) {
             file.write(contents.toJSONString());
@@ -520,7 +520,7 @@ public class XnatToBidsApi
             return false;
         }
     }
-    
+
     private boolean writeTsvRecord(final File tsvFile, final Object[] recordValues) {
         try (final FileWriter writer = new FileWriter(tsvFile, true)) {
             final CSVPrinter csvPrinter = new CSVPrinter((Appendable)writer, CSVFormat.TDF);
@@ -535,14 +535,14 @@ public class XnatToBidsApi
             return false;
         }
     }
-    
+
     private void log(final String logString) {
         System.out.println(logString);
         XnatToBidsApi._logger.info(logString);
     }
-    
+
     static {
-        _logger = LoggerFactory.getLogger((Class)XnatIcmExportDataPlugin.class);
+        _logger = LoggerFactory.getLogger((Class) XnatIntRunPipelinePlugin.class);
         XnatToBidsApi._xnatSessionTypes = Arrays.asList("xnat:mrSessionData", "xnat:crSessionData", "xnat:ctSessionData", "xnat:petSessionData", "xnat:petmrSessionData");
     }
 }

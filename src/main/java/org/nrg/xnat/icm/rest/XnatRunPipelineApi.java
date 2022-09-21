@@ -74,8 +74,8 @@ public class XnatRunPipelineApi
     private boolean _imageFormatAddBothImageFormats;
     public static String listImages[] = null;
 	private static String allOrListSubject;
-	
-    // Paramètres création session cluster à distance : 
+
+    // Paramètres création session cluster à distance :
     private static int port = 22;
     private static ChannelExec channel = null;
     private static Session session = null;
@@ -84,7 +84,7 @@ public class XnatRunPipelineApi
     private static ChannelShell channelShell = null;
 
     private static String fullPathScriptSlurm = "";
- 	// Les paramètres du cluster à distance 
+ 	// Les paramètres du cluster à distance
     public  static String user = "";
     private  static String host = "";
 
@@ -109,8 +109,8 @@ public class XnatRunPipelineApi
     public static String URI_HOST_XNAT = "";
     public static String CHANGE_WORKING_DIRECTORY = "#SBATCH --chdir=/tmp\n";
 
-    // path vers le fichier de configuration /var/lib/tomcat8/xnat_config_run_pipeline_cluster.json dans xnat. 
-	private static String config_file_xnat = "xnat_config_run_pipeline_cluster.json"; 
+    // path vers le fichier de configuration /var/lib/tomcat8/xnat_config_run_pipeline_cluster.json dans xnat.
+	private static String config_file_xnat = "xnat_config_run_pipeline_cluster.json";
     public static JSONObject jsonObject;
     public static ArrayList<String> listKeysJsonFile = null;
 
@@ -122,16 +122,16 @@ public class XnatRunPipelineApi
     @ResponseBody
     public void checkIdXnatIfIsIdCluster(final HttpServletResponse response)  throws IOException{
         final UserI xnatUser = XDAT.getUserDetails();
-        final String idCluster = xnatUser.getUsername().replace("_", "."); 
+        final String idCluster = xnatUser.getUsername().replace("_", ".");
         String ligne = "";
-        
-        
-        // Read config file and initialise  params  
+
+
+        // Read config file and initialise  params
 
        try {
 
             readConfigFileJson();
-       
+
        } catch (IOException ioe){
 
        } catch (Exception e){
@@ -142,11 +142,11 @@ public class XnatRunPipelineApi
         JSONArray teamNames = (JSONArray) jsonObject.get("teamNames");
 
         response.setContentType("application/json");
-            
+
         response.setCharacterEncoding("UTF-8");
-        
+
         JSONObject obj = new JSONObject();
-            
+
 
         try {
 
@@ -154,7 +154,7 @@ public class XnatRunPipelineApi
             //final String programName = userName ;
             final List<String> cmd = new ArrayList<String>();
             cmd.add(program);
-            cmd.add(idCluster); 
+            cmd.add(idCluster);
             log(cmd.toString());
 
             final ProcessBuilder pb = new ProcessBuilder(cmd);
@@ -177,30 +177,30 @@ public class XnatRunPipelineApi
                 array[i] = ele.toString();
                 i++;
             }
-    
-            HashSet<String> set = new HashSet<>(); 
-         
+
+            HashSet<String> set = new HashSet<>();
+
             set.addAll(Arrays.asList(tabTeamUser));
-             
+
             set.retainAll(Arrays.asList(array));
             if(set.size()>=1){
 
                 Map<String, String> _listPipelines  = new HashMap<>();
-            
+
                 String linkImgeSingularity = (String) jsonObject.get("linkAllImgSingularity");
-    
+
                 JSONArray jsonArray = (JSONArray) jsonObject.get("listPipelines");
-    
+
                 listImages = new String[jsonArray.size()];
-                                
+
                 obj.put("pipelines", jsonArray);
-                obj.put("id", idCluster);  
+                obj.put("id", idCluster);
 
 
              }else {
                 obj.put("pipelines","null");
              }
-            
+
         } else {
 
             obj.put("pipelines","null");
@@ -208,12 +208,12 @@ public class XnatRunPipelineApi
         }
 
         log("L'objet de la liste des pipelines a envoyer est "+ obj.toString());
-    
+
         PrintWriter out = response.getWriter();
 
         out.print(obj);
 
-        out.flush();      
+        out.flush();
 
         log( "\n La date de création de ce fichier est : "+getDateTimeNow() + "    \n\n");
     }
@@ -228,21 +228,21 @@ public class XnatRunPipelineApi
         final UserI xnatUser = XDAT.getUserDetails();
         ByteArrayOutputStream baos = null;
         final List<String> subjectsList = new LinkedList<String>();
-       
-        
+
+
         log("Runin pipeLine from [" + id_project + "]");
-        
+
 
         log("id niolon = "+idCluster);
 
-        user = idCluster;   
-        log("la liste séléctionné est   !! : "+subject_ids);        
+        user = idCluster;
+        log("la liste séléctionné est   !! : "+subject_ids);
         response.setContentType("application/json");
-            
+
         response.setCharacterEncoding("UTF-8");
-        
+
         JSONObject obj = new JSONObject();
-            
+
 
 
         if (checkIfIdUserExist(idCluster) && !("admin-xnat-root".contains(idCluster))) {
@@ -259,9 +259,9 @@ public class XnatRunPipelineApi
             JSONArray jsonArray = (JSONArray) jsonObject.get("listPipelines");
 
             listImages = new String[jsonArray.size()];
-                            
-            obj.put("pipelines", jsonArray);       
-            
+
+            obj.put("pipelines", jsonArray);
+
         } else {
 
             obj.put("pipelines","null");
@@ -269,14 +269,14 @@ public class XnatRunPipelineApi
         }
 
         log(" l'objet de la liste des pipelines a envoyer est "+ obj.toString());
-    
+
         PrintWriter out = response.getWriter();
 
         out.print(obj);
 
         out.flush();
 
-        
+
 
         log( "\n La date de création de ce fichier est : "+getDateTimeNow() + "    \n\n");
 
@@ -288,17 +288,17 @@ public class XnatRunPipelineApi
     @ApiOperation(value = "Get link of pipeline", notes = "Custom")
     @ApiResponses({ @ApiResponse(code = 200, message = "Connection success "), @ApiResponse(code = 401, message = "Must be authenticated to access the XNAT Rest Api"), @ApiResponse(code = 500, message = "Unexpected internal serval error") })
     @RequestMapping(value = { "/get-infos-pipeline" }, produces = { "application/json" }, method = { RequestMethod.POST })
-    @ResponseBody  
+    @ResponseBody
     public void getInfoAboutPipelineSelected(final HttpServletResponse response, @RequestParam("pipelineSelected") final String pipelineSelected)  throws IOException{
 
 
         if(jsonObject.equals(null)){
 
-            /* Lire le fichier et initialisation des params */ 
+            /* Lire le fichier et initialisation des params */
             try {
 
                 readConfigFileJson();
-        
+
             } catch (IOException ioe){
                 ioe.printStackTrace();
 
@@ -315,9 +315,9 @@ public class XnatRunPipelineApi
         // Préparer le listSessionOfSubject à envoyer en json
 
         response.setContentType("application/json");
-        
+
         response.setCharacterEncoding("UTF-8");
-        
+
         JSONObject obj = new JSONObject();
 
         obj.put("linkDoc",linkDoc);
@@ -325,7 +325,7 @@ public class XnatRunPipelineApi
         obj.put("commande_after", commande_after);
         obj.put("commande_participant", commande_participant);
 
-    
+
         log("lien a envoyer est  : " +obj.toString());
 
         PrintWriter out = response.getWriter();
@@ -333,7 +333,7 @@ public class XnatRunPipelineApi
         out.print(obj);
 
         out.flush();
-    
+
     }
 
 
@@ -344,8 +344,8 @@ public class XnatRunPipelineApi
     @ApiResponses({ @ApiResponse(code = 200, message = "Connection success "), @ApiResponse(code = 401, message = "Must be authenticated to access the XNAT Rest Api"), @ApiResponse(code = 500, message = "Unexpected internal serval error") })
     @RequestMapping(value = { "/start-pipeline/{id_project}" }, produces = { "application/json" }, method = { RequestMethod.POST })
     @ResponseBody
-    public void startPipelineInCluster(final HttpServletResponse response, @PathVariable final String id_project, @RequestParam("selectPipeline") final String selectPipeline,  @RequestParam("idCluster") final String idCluster, @RequestParam("subject_ids") final String subject_ids, @RequestParam("nameExportDir") final String nameExportDir, 
-                 @RequestParam("additionalParams") final String additionalParams, @RequestParam("sessions_ids") final String sessions_ids, 
+    public void startPipelineInCluster(final HttpServletResponse response, @PathVariable final String id_project, @RequestParam("selectPipeline") final String selectPipeline,  @RequestParam("idCluster") final String idCluster, @RequestParam("subject_ids") final String subject_ids, @RequestParam("nameExportDir") final String nameExportDir,
+                 @RequestParam("additionalParams") final String additionalParams, @RequestParam("sessions_ids") final String sessions_ids,
                     @RequestParam("radioValue")  final String radioValue, @RequestParam("commande_befor")  final String commande_befor, @RequestParam("commande_after")  final String commande_after,
                     @RequestParam("commande_participant")  final String commande_participant, @RequestParam("command_extra_bids")  final String command_extra_bids)  throws IOException{
 
@@ -368,22 +368,22 @@ public class XnatRunPipelineApi
 
 
 
-        
+
 
         log("** Start  pipeline **\n");
-        
+
         log("Runin pipeLine from [" + id_project + "]");
 
         log(" vous avez selectionné le projet ou sujets :  : [" + subject_ids + "]");
 
         log("l Export path params   est : " + nameExportDir );
 
-        
+
         /**
-         *  On récupère la list des sujets ou des sessions choisies 
-         * 
+         *  On récupère la list des sujets ou des sessions choisies
+         *
          */
-            
+
         try {
             //System.out.println("Subjects = " + subject_ids);
             if ("all".equals(subject_ids)) {
@@ -432,11 +432,11 @@ public class XnatRunPipelineApi
         /*- Tester si le fichier de config n'est pas encore lu -*/
         if(jsonObject.equals(null)){
 
-            /* Lire le fichier et initialisation des params */ 
+            /* Lire le fichier et initialisation des params */
             try {
 
                 readConfigFileJson();
-        
+
             } catch (IOException ioe){
                 ioe.printStackTrace();
 
@@ -460,21 +460,21 @@ public class XnatRunPipelineApi
         datTimeNow = getDateTimeNow();
 
         sifOrSimg(selectPipeline);
-        
+
         if (!additionalParams.equals(null)){
             ADDITIONAL_PARAMS = additionalParams;
         } else {
             ADDITIONAL_PARAMS = "\n";
         }
 
-        
+
 
         inputAndOutputDirectory = nameExportDir + "/" + data_xnat + "/" + idCluster + "_" +  selectPipeline + "_" + id_project + "_" + datTimeNow;
         pathErrorLogOut = "/home/"+ idCluster  + "/" + xnat_batch_scripts + "/" + idCluster + "_" + selectPipeline + "_" + id_project + "_" + datTimeNow + ".out";
         pathErrorLogErr = "/home/"+ idCluster  + "/" + xnat_batch_scripts + "/" + idCluster + "_" + selectPipeline + "_" + id_project + "_" + datTimeNow + ".err";
-        
-        SCRIPT_SBATCH_GLOBAL = SCRIPT_SBATCH_GLOBAL 
-            + SCRIPT_SBATCH  
+
+        SCRIPT_SBATCH_GLOBAL = SCRIPT_SBATCH_GLOBAL
+            + SCRIPT_SBATCH
             + NUMBER_OF_JOBS_PER_NODES
             + NUMBER_OF_NODES
             + CHANGE_WORKING_DIRECTORY
@@ -483,11 +483,11 @@ public class XnatRunPipelineApi
             + "\n" + STANDARD_ERROR_FILE + pathErrorLogErr
             + "\n" + NAME_OF_SLURM_JOB + " " + idCluster + "_" + selectPipeline
             + "\n" + getOtherParamatersSbatch(selectPipeline)
-            + "\n" + LOAD_MODULES 
+            + "\n" + LOAD_MODULES
             + "\n" +  "if [ ! -d \"" + exportDirectory +"\"  ]; then"
-            + "\n" +  "   mkdir -p " + exportDirectory 
+            + "\n" +  "   mkdir -p " + exportDirectory
             + "\n" +  "   echo \"Creating of directory " + exportDirectory + " \""
-            + "\n" +  "   chmod -R +777 " + exportDirectory 
+            + "\n" +  "   chmod -R +777 " + exportDirectory
             + "\n" +  "fi"
             + "\n" +  "\n" + "\n" + "\n"
             + "\n" + "" + commandeDownloadData(listOfSubjectWithCamasSeparated, id_project, inputAndOutputDirectory, listOfSubjectWithSpaceSeparated, sessions_ids, command_extra_bids)
@@ -496,30 +496,30 @@ public class XnatRunPipelineApi
             + "\n" + prepareCommandSingularity(selectPipeline,inputAndOutputDirectory,id_project, commande_befor, commande_after, commande_participant)
             + "  " + additionalParams + "\n"
             + "\n" + deleteOrNotDataAfterConversionToBIDS(radioValue,inputAndOutputDirectory + "/" + id_project);
-            
-            log(SCRIPT_SBATCH_GLOBAL);        
+
+            log(SCRIPT_SBATCH_GLOBAL);
 
         final String namFileGenerated = generateFIleScripte(SCRIPT_SBATCH_GLOBAL, selectPipeline, idCluster, id_project);
 
         log( "Le fichier à envoyer est  " + namFileGenerated );
-        
+
 
         log("\nLa commade générée est : ");
         log(prepareCommandSingularity(selectPipeline,inputAndOutputDirectory,id_project, commande_befor, commande_after, commande_participant));
-        
+
         // To send file to the cluster
-       
+
         try{
 
            ligneRetunrCommandeStartPipeline = sendFileToCluster(namFileGenerated, idCluster);
-           
+
            log("\nLe fichier a été envoyer avec succé");
 
            System.out.println(" Voici le contenu de la ligne " + ligneRetunrCommandeStartPipeline);
-        } catch (InterruptedException e) { 
-            
+        } catch (InterruptedException e) {
+
             e.printStackTrace();
-                
+
         }catch (JSchException  jshe){
 
             jshe.printStackTrace();
@@ -530,23 +530,23 @@ public class XnatRunPipelineApi
 
         }catch (SftpException sftpe){
             sftpe.printStackTrace();
-        } 
-        
+        }
+
         log("done !");
 
 
 
 
-        /* Preparé les données à envoyer: 
-        * ce sont les informations qui  corréspond au lancement du calcul afin qu'un utilsateur puisse les sauvegarder 
+        /* Preparé les données à envoyer:
+        * ce sont les informations qui  corréspond au lancement du calcul afin qu'un utilsateur puisse les sauvegarder
         * en .txt garder une trace
         */
         response.setContentType("application/json");
-        
+
         response.setCharacterEncoding("UTF-8");
-        
+
         JSONObject obj = new JSONObject();
-        
+
         String pathWithnNameScriptSbatch = "/home/" + idCluster + "/" + xnat_batch_scripts + "/" + namFileGenerated;
 
         obj.put("idJob",ligneRetunrCommandeStartPipeline);
@@ -554,7 +554,7 @@ public class XnatRunPipelineApi
         obj.put("pathWithnNameScriptSbatch", pathWithnNameScriptSbatch);
         obj.put("pathErrorLogOut", pathErrorLogOut);
         obj.put("pathErrorLogErr", pathErrorLogErr);
-        
+
         log("les sessions à envoyer sont : " +obj.toString());
 
         PrintWriter out = response.getWriter();
@@ -564,12 +564,12 @@ public class XnatRunPipelineApi
         out.flush();
 
 
-        
+
     }
 
 
     /* Return la commande singularity selon le pipeline choisi */
-    public String prepareCommandSingularity(String selectPipeline, String inputAndOutputDirectory, String id_project, String commande_befor, 
+    public String prepareCommandSingularity(String selectPipeline, String inputAndOutputDirectory, String id_project, String commande_befor,
         String commande_after, String commande_participant){
 
         /* Le répértoire où sont les données en BIDS */
@@ -595,13 +595,13 @@ public class XnatRunPipelineApi
 
 
         /* Préparation de la commande */
-        // On exclu bids_validator car il ne fait qu'un test de vérification si les données sont en BIDS, du coup 
+        // On exclu bids_validator car il ne fait qu'un test de vérification si les données sont en BIDS, du coup
         // il a pas besoin de répertoire des outputs
 
         if(!selectPipeline.contains("bids_validator")){
 
-        commande  = commande + singulartyRun 
-                    + singularityCleanEnv 
+        commande  = commande + singulartyRun
+                    + singularityCleanEnv
                     + " " + "-B " + dirData + ":/" +  inputDataBids
                     + " " + "-B " + inputAndOutputDirectory + ":/" + output
                     + " " + path_licence
@@ -609,26 +609,26 @@ public class XnatRunPipelineApi
                     + " " + licence_Params
                     + " " + commande_befor
                     + " " + data_key + " " + "/" +  inputDataBids
-                    + " " + output_key + " " + "/" + output 
+                    + " " + output_key + " " + "/" + output
                     + " " + commande_participant
-                    + " " + work_dir_params 
-                    + " " + commande_after 
+                    + " " + work_dir_params
+                    + " " + commande_after
                     + " " + basicParameters;
         } else {
 
-            commande  = commande + singulartyRun 
-                    + singularityCleanEnv 
+            commande  = commande + singulartyRun
+                    + singularityCleanEnv
                     + " " + "-B " + dirData + ":/" +  inputDataBids
                     + " " + linkImgeSingularity + "/" + name
                     + " " + data_key + " " + "/" +  inputDataBids;
-        }    
+        }
 
                     /*if(!selectPipeline.contains("bids_validator")){
 
                         commande = commande + "";
 
                     }*/
-        
+
         return commande;
 
 
@@ -652,33 +652,33 @@ public class XnatRunPipelineApi
     @ApiOperation(value = "Get list of session in subject", notes = "Custom")
     @ApiResponses({ @ApiResponse(code = 200, message = "Connection success "), @ApiResponse(code = 401, message = "Must be authenticated to access the XNAT Rest Api"), @ApiResponse(code = 500, message = "Unexpected internal serval error") })
     @RequestMapping(value = { "/get-sessions/{id_project}" }, produces = { "application/json" }, method = { RequestMethod.POST })
-    @ResponseBody  
+    @ResponseBody
     public void getSessionsOfSubjects(final HttpServletResponse response, @PathVariable final String id_project, @RequestParam("selectedSubject") final String selectedSubject)  throws IOException{
         final UserI xnatUser = XDAT.getUserDetails();
         ByteArrayOutputStream baos = null;
         final List<String> subjectsList = new LinkedList<String>();
         Map<String, String> listSessionOfSubject  = new HashMap<>();
-        String [] listAllsession = null; // mettre toute les sessions d'un projet 
+        String [] listAllsession = null; // mettre toute les sessions d'un projet
 
         String[] arrayOfselectedSubject = selectedSubject.split(",");
 
-        
+
         String dirName = "/data/xnat/archive/" + id_project + "/arc001";
 
         log("Vous avez choisi  [ " + id_project + " ] et sujet(s) : [ " + selectedSubject + " ]");
 
-        
-        
-        
+
+
+
         File fileName = new File(dirName);
-        
+
         File[] fileList = fileName.listFiles();
-        
+
         listAllsession = new String[fileList.length];
 
 
         for (String subject : arrayOfselectedSubject) {
-                                    
+
             for(int i= 0; i< listAllsession.length; i++){
 
                 listAllsession[i] = fileList[i].getName();
@@ -692,18 +692,18 @@ public class XnatRunPipelineApi
 
             }
         }
-        
+
 
         // Préparer le listSessionOfSubject à envoyer en json
 
         response.setContentType("application/json");
-        
+
         response.setCharacterEncoding("UTF-8");
-        
+
         JSONObject obj = new JSONObject();
 
         obj.putAll(listSessionOfSubject);
-        
+
         log("les sessions à envoyer sont : " +obj.toString());
 
         PrintWriter out = response.getWriter();
@@ -711,7 +711,7 @@ public class XnatRunPipelineApi
         out.print(obj);
 
         out.flush();
-    
+
     }
 
 
@@ -719,28 +719,28 @@ public class XnatRunPipelineApi
     @ApiOperation(value = "Get list of team names", notes = "Custom")
     @ApiResponses({ @ApiResponse(code = 200, message = "Connection success "), @ApiResponse(code = 401, message = "Must be authenticated to access the XNAT Rest Api"), @ApiResponse(code = 500, message = "Unexpected internal serval error") })
     @RequestMapping(value = { "/get-team-names" }, produces = { "application/json" }, method = { RequestMethod.POST })
-    @ResponseBody  
+    @ResponseBody
     public void getTeamNames(final HttpServletResponse response, @RequestParam("idCluster") final String idCluster)  throws IOException{
 
         final UserI xnatUser = XDAT.getUserDetails();
         final String userName = xnatUser.getUsername().replace("_", ".");
         String ligne = "";
         System.out.println(" Votre id xnat est : " + userName);
-    
-       /* Read config file and initialize  params */ 
+
+       /* Read config file and initialize  params */
         try {
 
             readConfigFileJson();
-       
+
         } catch (IOException ioe){
 
         } catch (Exception e){
 
         }
-       
+
         JSONArray teamNames = (JSONArray) jsonObject.get("teamNames");
         JSONObject js = new JSONObject();
-        
+
 
         try {
 
@@ -748,7 +748,7 @@ public class XnatRunPipelineApi
             //final String programName = userName ;
             final List<String> cmd = new ArrayList<String>();
             cmd.add(program);
-            cmd.add(idCluster); 
+            cmd.add(idCluster);
             log(cmd.toString());
 
             final ProcessBuilder pb = new ProcessBuilder(cmd);
@@ -756,7 +756,7 @@ public class XnatRunPipelineApi
             final InputStreamReader isr = new InputStreamReader(p.getInputStream());
             final BufferedReader br = new BufferedReader(isr);
             ligne = br.readLine();
-            
+
             System.out.println("les groupes de " + userName + " sont  : " + ligne);
         }
         catch (Exception e) {
@@ -774,31 +774,31 @@ public class XnatRunPipelineApi
                 array[i] = ele.toString();
                 i++;
             }
-    
-            HashSet<String> set = new HashSet<>(); 
-         
+
+            HashSet<String> set = new HashSet<>();
+
             set.addAll(Arrays.asList(tabTeamUser));
-             
+
             set.retainAll(Arrays.asList(array));
-             
+
 
             if(set.size()>=1){
 
 
                 System.out.println(set);
-             
+
                 //convert to array
                 String[] intersection = {};
                 intersection = set.toArray(intersection);
-                 
+
                 System.out.println(Arrays.toString(intersection));
-        
+
                 final Map<String, String> listTeam  = new HashMap<>();
                 // Stockage des teams dans une HashMap
                 for (String el : intersection) {
                     listTeam.put(el, el);
                 }
-                
+
                 js.putAll(listTeam);
 
              }else {
@@ -810,9 +810,9 @@ public class XnatRunPipelineApi
         }
 
         response.setContentType("application/json");
-        
+
         response.setCharacterEncoding("UTF-8");
-        
+
 
         log("Les noms des équipes à envoyer sont : " +teamNames.toString());
 
@@ -828,14 +828,14 @@ public class XnatRunPipelineApi
     public boolean checkIfIdUserExist(String idUser){
 
         String ligne = "";
-        
+
         try {
 
             final String program = "groups";
             //final String programName = userName ;
             final List<String> cmd = new ArrayList<String>();
             cmd.add(program);
-            cmd.add(idUser); 
+            cmd.add(idUser);
             log(cmd.toString());
 
             final ProcessBuilder pb = new ProcessBuilder(cmd);
@@ -843,7 +843,7 @@ public class XnatRunPipelineApi
             final InputStreamReader isr = new InputStreamReader(p.getInputStream());
             final BufferedReader br = new BufferedReader(isr);
             ligne = br.readLine();
-            
+
             System.out.println("le res de groups " + idUser + " est : "+ ligne);
         }
         catch (Exception e) {
@@ -853,37 +853,37 @@ public class XnatRunPipelineApi
         if(ligne != null){
             return true;
         }
-            //return !(ligne.contains("no such user")); 
-        else return false; 
-        
+            //return !(ligne.contains("no such user"));
+        else return false;
+
     }
 
     /* la méthode qui permet de  recupere le contenu la liste des images singularity sur niolon */
     public 	static  String[] recupererListImgCluster(String resultConsole){
-    	
+
     	listImages = resultConsole.split("\\r?\\n");
         System.out.println("\n la taille de tableau lines est  : "+listImages.length +"\n");
-            
+
     	return listImages;
     }
-    
+
 
 
     /* Cette a pour fonction d'établir une connection avec cluster de calcul */
     public void doConnectionCluster(String password) throws   InterruptedException, JSchException, IOException  {
-		
+
         String remoteFile = "ls";
-        
+
         //String  commande= "niolon_interactive; cd /hpc/crise/rahmani.a/script; ls";
-        
+
         try {
 
             JSch.setLogger(new MyLogger());
-            
+
             JSch jsch = new JSch();
-           
-            
-        /*  
+
+
+        /*
             java.util.Properties config = new java.util.Properties();
             config.put("StrictHostKeyChecking", "no");
 
@@ -891,90 +891,90 @@ public class XnatRunPipelineApi
             config.put("PreferredAuthentications", "publickey,keyboard-interactive,password");
         */
 
-            
+
             Properties config = new Properties();
-            
+
             config.put("kex", "diffie-hellman-group1-sha1,diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1,diffie-hellman-group-exchange-sha256");
 
             //session.setConfig("cipher.s2c", "aes128-ctr");
             //session.setConfig("cipher.c2s", "aes128-ctr");
-            
+
             config.put("StrictHostKeyChecking", "no");
-            
+
             session = jsch.getSession(user, host, port);
-            
+
             //jsch.addIdentity("/var/lib/tomcat08/.ssh");
-            
-           
-        
+
+
+
             session.setPassword(password);
-        
-            
-            
+
+
+
             session.setConfig(config);
-              
-            
+
+
             System.out.println("Establishing Connection...");
-        
+
             session.connect();
-        
+
             System.out.println("Connection established.");
-            
+
             log("********************** \n ");
 
             log("Connection established");
 
-            
+
             // Execution de la commande
-            
+
             channel = (ChannelExec) session.openChannel("exec");
-            
+
             channel.setCommand("ls /hpc/shared/apps/x86_64/softs/singularity_BIDSApps");
             //channel.setCommand("ls");
-            
+
             while (channel.isConnected()) {
                 Thread.sleep(1000);
             }
-            
+
             //channel.setCommand("cd /hpc/crise/rahmani.a/script ");
            // channel.setCommand("ls /hpc/shared/apps/x86_64/softs/singularity_BIDSApps");
-            
+
             ByteArrayOutputStream responseStream = new ByteArrayOutputStream();
             channel.setOutputStream(responseStream);
             channel.connect();
-            
+
             System.out.println(" ls success");
 
             log("ls success");
-            
+
             while (channel.isConnected()) {
                 Thread.sleep(100);
             }
-            
+
             String responseString = new String(responseStream.toByteArray());
             System.out.println(responseString);
-            
+
             /* On appel la fonction de recupération de l'enssemble des images*/
             log(recupererListImgCluster(responseString).toString());
-            
-			
-			
+
+
+
 			/*
-            
+
             System.out.println("Crating SFTP Channel.");
             ChannelSftp sftpChannel = (ChannelSftp) session.openChannel("sftp");
             sftpChannel.connect();
             System.out.println("SFTP Channel created.");
 
             InputStream inputStream = sftpChannel.get(remoteFile);
-            
+
             try (Scanner scanner = new Scanner(new InputStreamReader(inputStream))) {
                 while (scanner.hasNextLine()) {
                     String line = scanner.nextLine();
                     System.out.println(line);
                 }
             }*/
-            
+
         } catch (JSchException e) {
             e.printStackTrace();
 
@@ -983,16 +983,16 @@ public class XnatRunPipelineApi
                 session.disconnect();
                 //outputStream.close();
 				//inputStream.close();
-				
+
             }
             if (channel != null) {
                 channel.disconnect();
                 //channelShell.disconnect();
             }
         }
-	
 
-	
+
+
     }
 
     /* Cette fonction a pour but d'envoyer le fichier généré au cluster de calcul */
@@ -1000,11 +1000,11 @@ public class XnatRunPipelineApi
 
         /* Chemin vers le local file */
         String localFile = fullPathScriptSlurm;
-        
+
         log("Le fichier à envoyer est : " + fullPathScriptSlurm );
         /* Chemin où sera  transmit le fichier dans le cluster */
-        String remoteDir = "/home/"+idCluster; 
-        
+        String remoteDir = "/home/"+idCluster;
+
         String ligne = "";
 
         try {
@@ -1020,68 +1020,68 @@ public class XnatRunPipelineApi
                 cmd.add(option0);
                 cmd.add(option1);
                 cmd.add(option2);
-                cmd.add(option3);    
+                cmd.add(option3);
                 log(cmd.toString());
 
                 final ProcessBuilder pb = new ProcessBuilder(cmd);
                 final Process p = pb.start();
                 final InputStreamReader isr = new InputStreamReader(p.getInputStream());
                 final BufferedReader br = new BufferedReader(isr);
-               
+
                 ligne = br.readLine();
 
                /* while ((ligne = br.readLine()) != null) {
                     log(ligne);
                 }*/
 
-                
+
             }
             catch (Exception e) {
                 log(e.toString());
             }
 
-    
-        
-                
+
+
+
 /*         try {
-            
+
             JSch.setLogger(new MyLogger());
-        
+
             JSch jsch = new JSch();
 
             //jsch.setKnownHosts("~/.ssh/known_hosts");
             Properties config = new Properties();
-            
+
             //config.put("kex","curve25519-sha256, curve25519-sha256@libssh.org, diffie-hellman-group16-sha512, diffie-hellman-group18-sha512, diffie-hellman-group-exchange-sha256");
 
             config.put("kex", "diffie-hellman-group1-sha1,diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1,diffie-hellman-group-exchange-sha256");
 
             //session.setConfig("cipher.s2c", "aes128-ctr");
             //session.setConfig("cipher.c2s", "aes128-ctr");
-            
+
             config.put("StrictHostKeyChecking", "no");
 
-            
-            
+
+
             session = jsch.getSession(user, "niolon.int.univ-amu.fr", port);
-        
+
             session.setPassword(password);
-            
+
 
             session.setConfig(config);
 
             log("Establishing Connection...");
 
             session.connect();
-            
-        
+
+
             log("Connection established...");
 
             System.out.println("Crating SFTP Channel...");
-            
+
             ChannelSftp sftpChannel = (ChannelSftp) session.openChannel("sftp");
-            
-            
+
+
             try {
 
                 sftpChannel.connect();
@@ -1089,51 +1089,51 @@ public class XnatRunPipelineApi
             } catch (Exception e) {
                 throw new JSchException("Unable to connect to SFTP server. " + e.toString());
             }
-            
-            
+
+
            // sftpChannel.connect();
-            
+
             log("SFTP Channel created.");
-            
-            // la méthod  put pour envoyer le fichier 
+
+            // la méthod  put pour envoyer le fichier
             sftpChannel.put(localFile, remoteDir);
 
             //sftpChannel.put("/var/lib/tomcat8/Bureau/xnat2bids_reconstruct.py", remoteDir);
 
 
-            
+
             log(" submit  file with sucess ");
-            
+
             sftpChannel.exit();
 
-           
+
             channelShell = (ChannelShell) session.openChannel("shell");
-            
+
             inputStream = channelShell.getInputStream();//The data arriving from the far end can be read from this stream.
-            
+
             channelShell.setPty(true);
-            
+
             channelShell.connect();
-            
+
             log ("sell  channel is opned ! ");
 
             outputStream = channelShell.getOutputStream();
-            
+
             PrintWriter printWriter = new PrintWriter(outputStream);
-            
+
             printWriter.println("chmod +x " + remoteDir + "/" + nameFileGenerated);
 
             log("le scripte slum reçu est ====> "+remoteDir + "/" + nameFileGenerated);
-            
+
             printWriter.println(" sbatch ./"+nameFileGenerated);
-             
+
 
             printWriter.flush () ; // force the buffer data output
-        
-            
+
+
             byte[] tmp = new byte[1024];
             while(true){
-                
+
                 while(inputStream.available() > 0){
                     int i = inputStream.read(tmp, 0, 1024);
                     if(i < 0) break;
@@ -1151,9 +1151,9 @@ public class XnatRunPipelineApi
                 try{
                     Thread.sleep(1000);
                 }catch(Exception e){
-                    
+
                 }
-                
+
             }
 
         }catch (JSchException e) {
@@ -1161,12 +1161,12 @@ public class XnatRunPipelineApi
             e.printStackTrace();
 
         }finally {
-            
+
             if (session != null) {
                 session.disconnect();
                 outputStream.close();
                 inputStream.close();
-                    
+
                 }
             if (channel != null) {
                 channel.disconnect();
@@ -1176,9 +1176,9 @@ public class XnatRunPipelineApi
 
             return ligne;
 
-           
+
         }
-         
+
 
 
 /*         final SSHClient sshClient = new SSHClient();
@@ -1197,7 +1197,7 @@ public class XnatRunPipelineApi
 
                 sshClient.authPublickey(System.getProperty(user));
                 //final String src = System.getProperty("user.home") + File.separator + "test_file";
-                sshClient.newSCPFileTransfer().upload(new FileSystemFile(localFile),remoteDir); 
+                sshClient.newSCPFileTransfer().upload(new FileSystemFile(localFile),remoteDir);
 
 
             } finally {
@@ -1206,10 +1206,10 @@ public class XnatRunPipelineApi
         } finally {
             sshClient.disconnect();
 
-                
+
     } */
 
-    
+
 
     public static String getDateTimeNow(){
 
@@ -1237,7 +1237,7 @@ public class XnatRunPipelineApi
         final Date d = new Date();
         dateTime = dateTime + now.get(12) + "" + "_" + d.getSeconds();
 
-        return  dateTime; 
+        return  dateTime;
 
     }
 
@@ -1266,39 +1266,39 @@ public class XnatRunPipelineApi
 
       String    dirOutputpath = "/tmp/";
       String suiteName = userIdCluster + "_" + pipeLineSelected + "_" + idProject + "_" + datTimeNow + ".sh";
-      
+
       /* On concerver le nom  pour récupérer le bon fichier */
       fullPathScriptSlurm = dirOutputpath+suiteName;
 
 
       File f = new File(dirOutputpath+suiteName);
-      
+
       //f.setExecutable(true);
-      
+
       System.out.println(f.exists());
       log("Le fichier a été créer ! ");
 
       if(!f.getParentFile().exists()) {
           f.getParentFile().mkdirs();
-          
-      }        
+
+      }
 
       if(!f.exists()) {
          try {
             f.createNewFile();
          } catch (Exception e) {
             e.printStackTrace();
-         }        
+         }
       }
 
       try {
          File dir = new File(f.getParentFile(), f.getName());
          PrintWriter pWriter = new PrintWriter(dir);
-         // Ajouter le contenu du script au fichier slurm 
+         // Ajouter le contenu du script au fichier slurm
          pWriter.print(codeSbatch);
          //pWriter.print("writing anything..    . \n");
          //pWriter.print("writing anything..    .");
-         
+
          pWriter.close();
       } catch (FileNotFoundException e) {
          e.printStackTrace();
@@ -1309,8 +1309,8 @@ public class XnatRunPipelineApi
             Process proc = rt.exec("chmod +777 " + fullPathScriptSlurm );
 
         }catch (Exception e) {
-                log(e.toString()); 
-        }      
+                log(e.toString());
+        }
 
         return suiteName;
     }
@@ -1321,59 +1321,59 @@ public class XnatRunPipelineApi
         listKeysJsonFile = new ArrayList<String>();
 		// Parse json file
 		JSONParser parser = new JSONParser();
-		
+
 		try {
-			
-	
+
+
 		 jsonObject =  (JSONObject) parser.parse(new FileReader(config_file_xnat));
-		 
+
 		 System.out.println("Le fichier de config a été bien lu et parsé ");
-		 
+
 
 		} catch (IOException e) {
-			
+
             e.printStackTrace();
             System.out.println(e.getMessage());
 
 		}
-		
+
 		System.out.println("\n\n------------- Debut du programme ----------------\n");
 
-		
+
 		//System.out.println(jsonObject);
-		
+
 		System.out.println("This file contain " + jsonObject.size() + " objects");
-		
+
 		System.out.println("List of  objects ");
-		
-		System.out.println(jsonObject.keySet());	
-		
-		JSONObject objectJsonOfPipeline = null;	
-		
+
+		System.out.println(jsonObject.keySet());
+
+		JSONObject objectJsonOfPipeline = null;
+
 		for (Object key : jsonObject.keySet()) {
-			
+
 			System.out.println(key);
-			
+
 			listKeysJsonFile.add((String) key);
-			
+
 			try {
-				
+
 					objectJsonOfPipeline = (JSONObject) jsonObject.get(key);
-				
+
 					getInfoJsonObject1(objectJsonOfPipeline);
-					
+
 					System.out.println("\n\n\n\n");
-					
-								
+
+
 			} catch (Exception e) {
-				
+
 			}
-			
+
 		}
-		
-		
+
+
 		System.out.println( listKeysJsonFile);
-		
+
 		System.out.println("\n---------------------------------\n");
 
 
@@ -1381,28 +1381,28 @@ public class XnatRunPipelineApi
 
 
 	 /* Cette méthode permet de récupérer un Object JSON  par sa clé */
-	
+
     public static Object getJsonObjectByKey(JSONObject jsonObject, Object key) {
-			
+
 			return jsonObject.get(key);
-			
+
     }
 
-    /* 
+    /*
      * Pour chaque objet JSON dans le fichier de config
-     * on récupére toutes les  (key, value)     
+     * on récupére toutes les  (key, value)
      */
-	
+
 	public Map< String, String> getInfoJsonObject(JSONObject jsonObject){
 
 		Map<String, String> jsonContent =  new HashMap<String, String>();
-				
+
 				for (Object key : jsonObject.keySet()) {
-				
+
 					jsonContent.put(key.toString(), jsonObject.get(key).toString());
-					
+
 				}
-			
+
 		return jsonContent;
 	}
 
@@ -1410,36 +1410,36 @@ public class XnatRunPipelineApi
 	public static void getInfoJsonObject1(JSONObject jsonObject){
 
 		Map<String, String> jsonContent =  new HashMap<String, String>();
-				
+
 				for (Object key : jsonObject.keySet()) {
-				
+
 					jsonContent.put(key.toString(), jsonObject.get(key).toString());
 					System.out.println("\"" + key.toString() + "\" : " + " \"" + jsonObject.get(key).toString() + "\"");
-					
+
 				}
 	}
 
 
     public static String readFileAsString(String file)throws Exception {
         return new String(Files.readAllBytes(Paths.get(file)));
-    
+
     }
 
     /*
      * Cette fonction s'occupe de générer la commande Xnatdownload pour télécharger les données selon les chox de l'usr
      */
     public static String  commandeDownloadData(String subjectSelected, String projectName, String dirIputdata, String lisSubjectWithSpaceSeparated, String sessions_ids, String command_extra_bids){
-        
-        /* L'uri de XNAT */ 
+
+        /* L'uri de XNAT */
         URI_HOST_XNAT = (String) jsonObject.get("URI_HOST_XNAT");
         String xnat2bids = (String) jsonObject.get("xnat2bids");
 
         String filenameTxt = "\"" + dirIputdata + "/download_commandLine.txt" +"\"";
-        
+
         String filenameCsv = "\"" + dirIputdata + "/download_report.csv" +"\"";
 
         String dirDataInBIDS =  dirIputdata + "/" + projectName + "BIDS";
-        
+
         String commande = "source activate dax_env\n"
                 + "\n" + "filenameTxt=" + filenameTxt
                 + "\n" + "filenameCsv=" + filenameCsv
@@ -1453,31 +1453,31 @@ public class XnatRunPipelineApi
           } else if(!allOrListSubject.equals("all") && !(sessions_ids.equals(""))){
 
             commande += " --sess " + sessions_ids + " -s all --rs NIFTI,BIDS";
-            
+
           }else {
-              
+
             commande += " all -s all --rs NIFTI,BIDS \n";
-              
-          } 
+
+          }
 
           commande += "\n"
                     + "\n" +  "if [ -f $filenameTxt  ]; then"
-                    + "\n" +  "   rm $filenameTxt"  
+                    + "\n" +  "   rm $filenameTxt"
                     + "\n" +  "   echo \"download_txt removed\""
                     + "\n" +  "fi"
                     + "\n" +  "if [ -f $filenameCsv  ]; then"
-                    + "\n" +  "   rm $filenameCsv"  
+                    + "\n" +  "   rm $filenameCsv"
                     + "\n" +  "   echo \"download_csv removed\""
                     + "\n" +  "fi"
                     + "\n" +  "\n" + "\n" + "\n"
                     + "\n" +  "dirDataInBIDS=\"" + dirDataInBIDS + "\"\n"
-                    + "\n" +  "python " + xnat2bids + " " 
-                    + dirIputdata + "/" + projectName + " " + "$dirDataInBIDS" + " " + command_extra_bids 
+                    + "\n" +  "python " + xnat2bids + " "
+                    + dirIputdata + "/" + projectName + " " + "$dirDataInBIDS" + " " + command_extra_bids
                     + "\n";
                     //+  " " + lisSubjectWithSpaceSeparated +"\n";
-                    
-            
-          commande += "\nsource deactivate \n\n"; 
+
+
+          commande += "\nsource deactivate \n\n";
 
         // faut supprimer les fichier générer par Xnatdownload
         return commande;
@@ -1486,8 +1486,8 @@ public class XnatRunPipelineApi
 
     /* Cette methode renvoi d'autre paramétre sbatch a rajouter au script en slurm */
     public String getOtherParamatersSbatch(String selectPipeline){
-        
-        String commande = ""; 
+
+        String commande = "";
 
         switch(selectPipeline){
 
@@ -1498,7 +1498,7 @@ public class XnatRunPipelineApi
                          + "\n";
                 break;
 
-            case "   " : 
+            case "   " :
 
                 break;
 
@@ -1530,10 +1530,10 @@ public class XnatRunPipelineApi
         }
 
         if(whichPipeline.contains("bids_validator")){
-            
+
             return getCommandeBidsValidator(whichPipeline,inputDirBIDS);
         }
-        
+
         else return "";
 
     }
@@ -1541,9 +1541,9 @@ public class XnatRunPipelineApi
 
     // version : sera la commande passée
     public String  getCommandeMacapype(String version, String inputDirBIDS){
-        
+
         String dirData = inputDirBIDS + "/" + ID_PROJECT + "BIDS";
-        
+
 
         String commande = "\n" + "singularity run -B " + dirData + ":/data/macapype "
                         + " " + "-B " + inputDirBIDS + ":/out ";
@@ -1553,15 +1553,15 @@ public class XnatRunPipelineApi
                   + "-data /data/macapype/ "
                   + "-out /out/" + "output" + ID_PROJECT + "_" + datTimeNow + " "
                   + "-soft ANTS -species macaque ";
-  
+
     /*     commande += "python /opt/packages/macapype/workflows/segment_pnh.py "
                   + "-data /data/macapype/ "
                   + "-out /out/" + "output" + ID_PROJECT + "_" + datTimeNow + " "
                   + "-soft ANTS -params /opt/packages/macapype/workflows/params_segment_macaque_ants_based.json "; */
-    
+
     return commande;
     }
-    
+
 
     public String getCommandeFmriPrepSimg(String version , String inputDirBIDS){
 
@@ -1584,7 +1584,7 @@ public class XnatRunPipelineApi
                         + "--cifti-output --low-mem --mem-mb 32000 --nthreads 64";
                         */
 
-        return commande; 
+        return commande;
     }
 
 
@@ -1599,9 +1599,9 @@ public class XnatRunPipelineApi
                         + "--verbose-reports "
                         + "/data /out/" + "output" + ID_PROJECT + "_" + datTimeNow + " participant "
                         + " group";
-                  
+
         return commande;
-         
+
     }
 
 
@@ -1614,9 +1614,9 @@ public class XnatRunPipelineApi
                         + "/hpc/shared/apps/x86_64/softs/singularity_BIDSApps/" + version + " "
                         + "/data"
                         + "\n";
-                  
+
         return commande;
-         
+
     }
 
 
@@ -1657,7 +1657,7 @@ public class XnatRunPipelineApi
             return null;
         }
     }
-    
+
 
     public static void getAllFiles(final File dir, final List<File> fileList) {
         try {
@@ -1678,7 +1678,7 @@ public class XnatRunPipelineApi
             e.printStackTrace();
         }
     }
-    
+
     public ZipOutputStream writeZipFile(final File directoryToZip, final List<File> fileList) {
         try {
             final FileOutputStream fos = new FileOutputStream("/data/xnat/tmp/" + directoryToZip.getName() + ".tar.gz");
@@ -1702,7 +1702,7 @@ public class XnatRunPipelineApi
             return null;
         }
     }
-    
+
     public static void addToZip(final File directoryToZip, final File file, final ZipOutputStream zos) throws FileNotFoundException, IOException {
         final FileInputStream fis = new FileInputStream(file);
         final String zipFilePath = file.getCanonicalPath().substring(directoryToZip.getCanonicalPath().length() + 1, file.getCanonicalPath().length());
@@ -1717,12 +1717,12 @@ public class XnatRunPipelineApi
         zos.closeEntry();
         fis.close();
     }
-    
+
     public static void clean(final String fileName) throws FileNotFoundException, IOException {
         FileUtils.deleteDirectory(new File("/data/xnat/tmp/" + fileName));
         FileUtils.forceDelete(new File("/data/xnat/tmp/" + fileName + ".tar.gz"));
     }
-    
+
     public void zip2(final String fileName) {
         try {
             final ProcessBuilder pb = new ProcessBuilder(new String[] { "python", "zip.py", "" + fileName });
@@ -1738,12 +1738,12 @@ public class XnatRunPipelineApi
             log(e.toString());
         }
     }
-    
+
     private static void log(final String logString) {
         System.out.println(logString);
         XnatRunPipelineApi._logger.info(logString);
     }
-    
+
     static {
         _logger = LoggerFactory.getLogger((Class)XnatIntRunPipelinePlugin.class);
         XnatRunPipelineApi._xnatSessionTypes = Arrays.asList("xnat:mrSessionData", "xnat:crSessionData", "xnat:ctSessionData", "xnat:petSessionData", "xnat:petmrSessionData");
@@ -1753,7 +1753,7 @@ public class XnatRunPipelineApi
 
     // to print  logger in file.log
     public static class MyLogger implements com.jcraft.jsch.Logger {
-    
+
     static java.util.Hashtable name=new java.util.Hashtable();
     static{
       name.put(new Integer(DEBUG), "DEBUG: ");
